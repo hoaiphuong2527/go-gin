@@ -24,11 +24,6 @@ func GetUserByID(id string) (models.User, error) {
 }
 
 func UpdateUser(user models.User, userData dto.UpdateUserDTO) (models.User, error) {
-	// var user models.User
-	// if err := config.DB.First(&user, "id = ?", id).Error; err != nil {
-	// 	return user, err
-	// }
-
 	config.DB.Model(&user).Updates(userData)
 	return user, nil
 }

@@ -1,9 +1,11 @@
 package services
 
 import (
+	"go-gin-framework/constants"
 	"go-gin-framework/dto"
 	"go-gin-framework/models"
 	"go-gin-framework/repositories"
+	"go-gin-framework/utils"
 
 	"github.com/jinzhu/copier"
 )
@@ -14,9 +16,11 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 	if err != nil {
 		return dto.UserResponseDTO{}, err
 	}
-
+	if err := user.HashPassword(); err != nil {
+		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrHashPassword, "Failed to hash password")
+	}
 	if err := repositories.CreateUser(user); err != nil {
-		return dto.UserResponseDTO{}, err
+		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrDatabaseError, err.Error())
 	}
 
 	var response dto.UserResponseDTO
@@ -28,7 +32,7 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 func GetAllUsers() ([]dto.UserResponseDTO, error) {
 	users, errGetList := repositories.GetAllUsers()
 	if errGetList != nil {
-		return nil, errGetList
+		return nil, utils.NewAppError(constants.ErrDatabaseError, errGetList.Error())
 	}
 
 	var response []dto.UserResponseDTO
@@ -43,7 +47,7 @@ func GetAllUsers() ([]dto.UserResponseDTO, error) {
 func GetOne(userId string) (dto.UserResponseDTO, error) {
 	user, errDB := repositories.GetUserByID(userId)
 	if errDB != nil {
-		return dto.UserResponseDTO{}, errDB
+		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrDatabaseError, errDB.Error())
 	}
 
 	var response dto.UserResponseDTO
@@ -58,7 +62,7 @@ func GetOne(userId string) (dto.UserResponseDTO, error) {
 func UpdateUser(userId string, userDTO dto.UpdateUserDTO) (dto.UserResponseDTO, error) {
 	user, errDB := repositories.GetUserByID(userId)
 	if errDB != nil {
-		return dto.UserResponseDTO{}, errDB
+		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrDatabaseError, errDB.Error())
 	}
 	errMapping := copier.Copy(&user, &userDTO)
 	if errMapping != nil {
@@ -78,7 +82,7 @@ func UpdateUser(userId string, userDTO dto.UpdateUserDTO) (dto.UserResponseDTO, 
 func DeleteUser(userId string) error {
 	errDB := repositories.DeleteUser(userId)
 	if errDB != nil {
-		return errDB
+		return utils.NewAppError(constants.ErrDatabaseError, errDB.Error())
 	}
 	return nil
 }
