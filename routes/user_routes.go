@@ -2,18 +2,22 @@ package routes
 
 import (
 	"go-gin-framework/controllers"
-	"go-gin-framework/middlewares"
+	// "go-gin-framework/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-
-	userRoutes := r.Group("/users")
+	userGroup := r.Group("/users")
 	{
-		userRoutes.GET("/", middlewares.AuthMiddleware(), controllers.GetUsers)
-		userRoutes.POST("/", controllers.CreateUser)
+		// userGroup.GET("/", middlewares.AuthMiddleware(), controllers.GetAllUsers)
+
+		userGroup.POST("/", controllers.CreateUser)
+		userGroup.GET("/", controllers.GetAllUsers)
+		userGroup.GET("/:id", controllers.GetUser)
+		userGroup.PUT("/:id", controllers.UpdateUser)
+		userGroup.DELETE("/:id", controllers.DeleteUser)
 	}
 
 	return r
