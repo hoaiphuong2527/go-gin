@@ -16,7 +16,7 @@ func Login(dtoLogin dto.LoginDTO) (dto.AuthResponseDTO, error) {
 	if check := user.CheckPassword(dtoLogin.Password); !check {
 		return dto.AuthResponseDTO{}, utils.NewAppError(constants.InvalidCredentials, "Invalid credentials")
 	}
-	token, err := middlewares.GenerateJWT(user.ID)
+	token, err := middlewares.GenerateJWT(user.ID, user.Role)
 	if err != nil {
 		return dto.AuthResponseDTO{}, utils.NewAppError(constants.ErrGenerateToken, "Cannot generate token")
 	}

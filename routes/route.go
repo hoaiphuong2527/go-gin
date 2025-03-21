@@ -9,20 +9,23 @@ import (
 
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
-	authGroup := r.Group("/auth")
+	apiGroup := r.Group("/api")
+	authGroup := apiGroup.Group("/auth")
 	{
 		authGroup.POST("/login", controllers.Login)
 	}
 
-	userGroup := r.Group("/users")
+	meGroup := apiGroup.Group("/me")
+	meGroup.Use(middlewares.JWTMiddleware())
+	meGroup.GET("/", controllers.GetUserProfile)
+
+	userGroup := apiGroup.Group("/users")
 	userGroup.Use(middlewares.JWTMiddleware())
-	{
-		userGroup.POST("/", controllers.CreateUser)
-		userGroup.GET("/", controllers.GetAllUsers)
-		userGroup.GET("/:id", controllers.GetUser)
-		userGroup.PUT("/:id", controllers.UpdateUser)
-		userGroup.DELETE("/:id", controllers.DeleteUser)
-	}
+	userGroup.POST("/", middlewares.RequireRole("admin"), controllers.CreateUser)
+	userGroup.GET("/", middlewares.RequireRole("admin"), controllers.GetAllUsers)
+	userGroup.GET("/:id", controllers.GetUser)
+	userGroup.PUT("/:id", controllers.UpdateUser)
+	userGroup.DELETE("/:id", controllers.DeleteUser)
 
 	return r
 }

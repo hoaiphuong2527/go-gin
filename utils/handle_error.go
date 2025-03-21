@@ -27,12 +27,12 @@ func HandleError(c *gin.Context, err error, defaultMsg string, codeHttp ...int) 
 
 func HandleErrorAuth(c *gin.Context, err error, defaultMsg string) {
 	if appErr, ok := err.(*AppError); ok {
-		c.JSON(http.StatusForbidden, dto.AppResponse{
+		c.JSON(http.StatusUnauthorized, dto.AppResponse{
 			Success: false,
 			Message: appErr.Error(),
 		})
 	} else {
-		c.JSON(http.StatusForbidden, dto.AppResponse{
+		c.JSON(http.StatusUnauthorized, dto.AppResponse{
 			Success: false,
 			Message: defaultMsg,
 		})

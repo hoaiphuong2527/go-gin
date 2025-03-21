@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"go-gin-framework/models"
 	"log"
 
 	"gorm.io/driver/mysql"
@@ -20,6 +21,7 @@ func ConnectDatabase() {
 	dbHost := GetEnv("DB_HOST", "localhost")
 	dbPort := GetEnv("DB_PORT", "3306")
 	dbName := GetEnv("DB_NAME", "mydatabase")
+	dbAuthSync := GetEnv("DB_AUTO_SYNC", "false")
 	var err error
 	if dbDriver == "mysql" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -34,6 +36,8 @@ func ConnectDatabase() {
 	if err != nil {
 		log.Fatal("🚀 Failed to connect to database:", err)
 	}
-
+	if dbAuthSync == "true" {
+		DB.AutoMigrate(&models.User{})
+	}
 	log.Println("✅ Connected to the database successfully!")
 }

@@ -18,6 +18,9 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 	if err != nil {
 		return dto.UserResponseDTO{}, err
 	}
+	if user.Role == "" {
+		user.Role = "user"
+	}
 	if err := user.HashPassword(); err != nil {
 		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrHashPassword, "Failed to hash password")
 	}

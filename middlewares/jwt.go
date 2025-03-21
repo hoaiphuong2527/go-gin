@@ -18,18 +18,20 @@ func init() {
 	err := godotenv.Load()
 	if err != nil {
 		fmt.Println("Warning: No .env file found")
+	} else {
+		fmt.Println(".env file loaded successfully")
 	}
 }
 
-var secretKey = []byte(os.Getenv("JWT_SECRET"))
+var secretKey = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 // GenerateJWT tạo token JWT
-func GenerateJWT(userID uint) (string, error) {
+func GenerateJWT(userID uint, userRole string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userID,
+		"role":    userRole,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(),
 	})
-
 	return token.SignedString(secretKey)
 }
 
@@ -81,6 +83,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		// save user_id into context to use after handler
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user_id", uint(claims["user_id"].(float64)))
+			c.Set("role", claims["role"])
 		} else {
 			c.JSON(http.StatusUnauthorized, dto.AppResponse{
 				Success: false,

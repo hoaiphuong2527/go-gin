@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"go-gin-framework/constants"
 	"go-gin-framework/dto"
 	"go-gin-framework/services"
@@ -35,5 +36,27 @@ func Login(c *gin.Context) {
 		Success: true,
 		Message: "",
 		Data:    response,
+	})
+}
+
+func GetUserProfile(c *gin.Context) {
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, dto.AppResponse{
+			Success: false,
+			Code:    constants.InvalidTokenClaims,
+			Message: "Unauthorized",
+		})
+		return
+	}
+	userIDStr := fmt.Sprintf("%d", userID.(uint))
+	user, err := services.GetOne(userIDStr)
+	if err != nil {
+		utils.HandleErrorAuth(c, err, "User not found")
+		return
+	}
+	c.JSON(http.StatusOK, dto.AppResponse{
+		Success: true,
+		Data:    user,
 	})
 }
