@@ -1,6 +1,6 @@
 package dto
 
-type Response struct {
+type AppResponse struct {
 	Success bool        `json:"success"`
 	Code    int         `json:"code,omitempty"`
 	Message string      `json:"message"`

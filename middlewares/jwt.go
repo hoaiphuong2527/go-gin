@@ -39,7 +39,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		// get token from Header
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.JSON(http.StatusUnauthorized, dto.Response{
+			c.JSON(http.StatusUnauthorized, dto.AppResponse{
 				Success: false,
 				Code:    constants.NotFoundToken,
 				Message: "Token not provided",
@@ -51,7 +51,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		// trim "Bearer " out token
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		if tokenString == authHeader {
-			c.JSON(http.StatusUnauthorized, dto.Response{
+			c.JSON(http.StatusUnauthorized, dto.AppResponse{
 				Success: false,
 				Code:    constants.TokenFomartInvalid,
 				Message: "Invalid token format",
@@ -69,7 +69,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, dto.Response{
+			c.JSON(http.StatusUnauthorized, dto.AppResponse{
 				Success: false,
 				Code:    constants.InvalidToken,
 				Message: "Invalid token",
@@ -82,7 +82,7 @@ func JWTMiddleware() gin.HandlerFunc {
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
 			c.Set("user_id", uint(claims["user_id"].(float64)))
 		} else {
-			c.JSON(http.StatusUnauthorized, dto.Response{
+			c.JSON(http.StatusUnauthorized, dto.AppResponse{
 				Success: false,
 				Code:    constants.InvalidTokenClaims,
 				Message: "Invalid token claims",

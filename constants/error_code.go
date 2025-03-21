@@ -1,6 +1,7 @@
 package constants
 
 const (
+	ErrServer          = 9999
 	ErrDuplicateUser   = 1000
 	ErrUserNotFound    = 1001
 	ErrInvalidRequest  = 1002

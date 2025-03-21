@@ -15,7 +15,7 @@ func Login(c *gin.Context) {
 	var loginDto dto.LoginDTO
 
 	if err := c.ShouldBindJSON(&loginDto); err != nil {
-		c.JSON(http.StatusBadRequest, dto.Response{
+		c.JSON(http.StatusBadRequest, dto.AppResponse{
 			Success: false,
 			Code:    constants.ErrInvalidRequest,
 			Message: err.Error(),
@@ -25,25 +25,13 @@ func Login(c *gin.Context) {
 
 	token, err := services.Login(loginDto)
 	if err != nil {
-		if appErr, ok := err.(*utils.AppError); ok {
-			c.JSON(http.StatusConflict, dto.Response{
-				Success: false,
-				Code:    appErr.GetCode(),
-				Message: appErr.GetMessage(),
-			})
-		} else {
-			c.JSON(http.StatusForbidden, dto.Response{
-				Success: false,
-				Code:    constants.InvalidCredentials,
-				Message: "Invalid credentials",
-			})
-		}
+		utils.HandleErrorAuth(c, err, "Invalid credentials")
 		return
 	}
 	var response dto.AuthResponseDTO
 	copier.Copy(&response, &token)
 
-	c.JSON(http.StatusCreated, dto.Response{
+	c.JSON(http.StatusCreated, dto.AppResponse{
 		Success: true,
 		Message: "",
 		Data:    response,

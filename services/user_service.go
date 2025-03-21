@@ -6,7 +6,9 @@ import (
 	"go-gin-framework/models"
 	"go-gin-framework/repositories"
 	"go-gin-framework/utils"
+	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/copier"
 )
 
@@ -29,16 +31,23 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 	return response, nil
 }
 
-func GetAllUsers() ([]dto.UserResponseDTO, error) {
-	users, errGetList := repositories.GetAllUsers()
-	if errGetList != nil {
-		return nil, utils.NewAppError(constants.ErrDatabaseError, errGetList.Error())
-	}
+func GetAllUsers(context *gin.Context) (dto.PaginatedResponse, error) {
+	page, _ := strconv.Atoi(context.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(context.DefaultQuery("pageSize", "10"))
 
-	var response []dto.UserResponseDTO
-	err := copier.Copy(&response, &users)
-	if err != nil {
-		return nil, err
+	users, total, errGetList := repositories.GetUsers(context, page, pageSize)
+	if errGetList != nil {
+		return dto.PaginatedResponse{}, utils.NewAppError(constants.ErrDatabaseError, errGetList.Error())
+	}
+	var mapDto []dto.UserResponseDTO
+	copier.Copy(&mapDto, &users)
+
+	response := dto.PaginatedResponse{
+		Data:       mapDto,
+		Total:      total,
+		Page:       page,
+		PageSize:   pageSize,
+		TotalPages: int((total + int64(pageSize) - 1) / int64(pageSize)),
 	}
 
 	return response, nil

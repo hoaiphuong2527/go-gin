@@ -4,6 +4,8 @@ import (
 	"go-gin-framework/config"
 	"go-gin-framework/dto"
 	"go-gin-framework/models"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetAllUsers() ([]models.User, error) {
@@ -36,4 +38,25 @@ func GetUserByEmail(email string) (models.User, error) {
 	var user models.User
 	err := config.DB.First(&user, "email = ?", email).Error
 	return user, err
+}
+
+func GetUsers(context *gin.Context, page int, pageSize int) ([]models.User, int64, error) {
+	var users []models.User
+	var total int64
+
+	query := config.DB.Model(&models.User{})
+
+	if name := context.Query("name"); name != "" {
+		query = query.Where("name LIKE ?", "%"+name+"%")
+	}
+	if email := context.Query("email"); email != "" {
+		query = query.Where("email LIKE ?", "%"+email+"%")
+	}
+
+	query.Count(&total)
+
+	offset := (page - 1) * pageSize
+	err := query.Offset(offset).Limit(pageSize).Find(&users).Error
+
+	return users, total, err
 }
