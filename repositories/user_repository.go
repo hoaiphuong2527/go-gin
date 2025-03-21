@@ -31,3 +31,9 @@ func UpdateUser(user models.User, userData dto.UpdateUserDTO) (models.User, erro
 func DeleteUser(id string) error {
 	return config.DB.Delete(&models.User{}, "id = ?", id).Error
 }
+
+func GetUserByEmail(email string) (models.User, error) {
+	var user models.User
+	err := config.DB.First(&user, "email = ?", email).Error
+	return user, err
+}
