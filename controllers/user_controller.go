@@ -8,7 +8,6 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jinzhu/copier"
 )
 
 func GetAllUsers(c *gin.Context) {
@@ -22,13 +21,10 @@ func GetAllUsers(c *gin.Context) {
 		return
 	}
 
-	var response dto.UserResponseDTO
-	copier.Copy(&response, &users)
-
 	c.JSON(http.StatusCreated, dto.Response{
 		Success: true,
 		Message: "Fetch users successfully",
-		Data:    response,
+		Data:    users,
 	})
 }
 
@@ -62,13 +58,10 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	var response dto.UserResponseDTO
-	copier.Copy(&response, &user)
-
 	c.JSON(http.StatusCreated, dto.Response{
 		Success: true,
 		Message: "User created successfully",
-		Data:    response,
+		Data:    user,
 	})
 }
 
@@ -84,13 +77,10 @@ func GetUser(c *gin.Context) {
 		return
 	}
 
-	var response dto.UserResponseDTO
-	copier.Copy(&response, &user)
-
 	c.JSON(http.StatusOK, dto.Response{
 		Success: true,
 		Message: "User retrieved successfully",
-		Data:    response,
+		Data:    user,
 	})
 }
 
@@ -123,13 +113,11 @@ func UpdateUser(c *gin.Context) {
 		}
 		return
 	}
-	var response dto.UserResponseDTO
-	copier.Copy(&response, &user)
 
 	c.JSON(http.StatusOK, dto.Response{
 		Success: true,
 		Message: "User updated successfully",
-		Data:    response,
+		Data:    user,
 	})
 }
 
