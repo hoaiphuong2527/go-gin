@@ -34,18 +34,18 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 	return response, nil
 }
 
-func GetAllUsers(context *gin.Context) (dto.PaginatedResponse, error) {
+func GetAllUsers(context *gin.Context) (dto.PaginateResponse, error) {
 	page, _ := strconv.Atoi(context.DefaultQuery("page", "1"))
 	pageSize, _ := strconv.Atoi(context.DefaultQuery("pageSize", "10"))
 
 	users, total, errGetList := repositories.GetUsers(context, page, pageSize)
 	if errGetList != nil {
-		return dto.PaginatedResponse{}, utils.NewAppError(constants.ErrDatabaseError, errGetList.Error())
+		return dto.PaginateResponse{}, utils.NewAppError(constants.ErrDatabaseError, errGetList.Error())
 	}
 	var mapDto []dto.UserResponseDTO
 	copier.Copy(&mapDto, &users)
 
-	response := dto.PaginatedResponse{
+	response := dto.PaginateResponse{
 		Data:       mapDto,
 		Total:      total,
 		Page:       page,
