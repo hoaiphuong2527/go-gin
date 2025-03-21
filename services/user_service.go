@@ -28,6 +28,12 @@ func CreateUser(userDTO dto.CreateUserDTO) (dto.UserResponseDTO, error) {
 		return dto.UserResponseDTO{}, utils.NewAppError(constants.ErrDatabaseError, err.Error())
 	}
 
+	// haven't tested yet
+	// errMail := utils.SendMail(user.Email, "Welcome", "Welcome to Golang")
+	// if errMail != nil {
+	// 	logger := utils.GetLogger()
+	// 	logger.Error("Failed to send email", zap.String("to", user.Email), zap.Error(err))
+	// }
 	var response dto.UserResponseDTO
 	copier.Copy(&response, &user)
 
